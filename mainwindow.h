@@ -15,6 +15,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 #include <list>
+#include "RubikState.h"
 
 using namespace std;
 using namespace cv;
@@ -42,12 +43,14 @@ private slots:
 
     void on_divideButton_clicked();
 
+    void on_scanButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString filename;
     int cubeRow;
     int cubeCol;
-    QImage *Qimage;//image in qt
+    QImage Qimage;//image in qt
     cv::Mat image; //image during treatment in OpenCV
     cv::Mat image_origin;
 };

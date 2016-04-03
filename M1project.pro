@@ -13,9 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    RubikState.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    RubikState.h \
+    Utils.h \
+    IndexOutOfBoundsException.h
 
 FORMS    += mainwindow.ui
 

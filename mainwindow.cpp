@@ -28,9 +28,10 @@ void MainWindow::on_OpenFile_clicked()
     {
         image_origin = cv::imread(filename.toLocal8Bit().data());
         cv::cvtColor(image_origin, image, CV_BGR2RGB);
-        Qimage = new QImage((const unsigned char*)(image.data), image.cols, image.rows, QImage::Format_RGB888);
-        QImage imgScaled = Qimage->scaled(ui->picLabel->size(),Qt::KeepAspectRatio);//图像自适应label大小
-        ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));//图像插入label
+        QImage img = QImage((const unsigned char*)(image.data),image.cols,image.rows, image.cols*image.channels(),  QImage::Format_RGB888);
+        QImage imgScaled = img.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);//图像自适应label大小
+        ui->picLabel->clear();
+        ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));
     }
 }
 
@@ -38,7 +39,7 @@ void MainWindow::on_divideButton_clicked()
 {
     cubeRow = ui->cubeRow->value();
     cubeCol = ui->cubeCol->value();
-    if(cubeRow*cubeCol >= 4 && !filename.isEmpty())
+    if(cubeRow*cubeCol >= 4 && !filename.isEmpty() && image_origin.rows >= cubeRow*3 && image_origin.cols >= cubeCol*3)
     {
         //I. divide image
         //1.prepare
@@ -93,9 +94,17 @@ void MainWindow::on_divideButton_clicked()
         cv::resize(fixedImage, image_resize, dsize);
         image_resize = changeRubixColor(image_resize);
         cv::cvtColor(image_resize, image_resize, CV_BGR2RGB);
-        Qimage= new QImage((const unsigned char*)(image_resize.data), image_resize.cols, image_resize.rows, QImage::Format_RGB888);
-        QImage imgScaled = Qimage->scaled(ui->picLabel->size(),Qt::KeepAspectRatio);//图像自适应label大小
-        ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));//图像插入label
+        //Qimage= new QImage((const unsigned char*)(image_resize.data), image_resize.cols, image_resize.rows, QImage::Format_RGB888);
+
+        QImage QimgResize = QImage((const unsigned char*)(image_resize.data),image_resize.cols,image_resize.rows, image_resize.cols*image_resize.channels(),  QImage::Format_RGB888);
+        ui->picLabel->clear();
+        QImage imgScaled = QimgResize.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);
+        ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));//image insert into label
+
+        /*--------------------------drawing grids----------------------------*/
+
+        /*------------output the image resize pixel info to a file-----------*/
+
     }
     else if(cubeRow*cubeCol < 4)
     {
@@ -107,6 +116,12 @@ void MainWindow::on_divideButton_clicked()
     {
         int ret2 = QMessageBox::warning(this, "Warning", "You need choose an image file!", QMessageBox::Abort);
         if (ret2 == QMessageBox::Abort)
+            qDebug() << "WARNING!!";
+    }
+    else if(image_origin.rows < cubeRow*3 || image_origin.cols < cubeCol*3)
+    {
+        int ret3 = QMessageBox::warning(this, "Warning", "Too many cubes!", QMessageBox::Abort);
+        if (ret3 == QMessageBox::Abort)
             qDebug() << "WARNING!!";
     }
 }
@@ -144,7 +159,6 @@ float vec3bDist(cv::Vec3b a, cv::Vec3b b)
 
 cv::Vec3b closestPaletteColor(cv::Vec3b color, cv::Mat palette)
 {
-    int i = 0;
     int minI = 0;
     cv::Vec3b diff = color - palette.at<Vec3b>(0);
     float minDistance = vec3bDist(color, palette.at<Vec3b>(0));
@@ -207,4 +221,12 @@ cv::Mat changeRubixColor(cv::Mat _image)
     cvtColor(imgPosterized, imgPosterizedBGR, CV_Lab2BGR);
     cvtColor(fs, fsBGR, CV_Lab2BGR);
     return fsBGR;
+}
+
+void MainWindow::on_scanButton_clicked()
+{
+    RubikState rubikState(0);
+
+    rubikState.launchCapture();
+
 }
