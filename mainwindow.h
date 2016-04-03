@@ -45,6 +45,8 @@ private slots:
 
     void on_scanButton_clicked();
 
+    void on_rmGridsButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString filename;

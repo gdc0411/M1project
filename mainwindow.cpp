@@ -31,6 +31,7 @@ void MainWindow::on_OpenFile_clicked()
         QImage img = QImage((const unsigned char*)(image.data),image.cols,image.rows, image.cols*image.channels(),  QImage::Format_RGB888);
         QImage imgScaled = img.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);//图像自适应label大小
         ui->picLabel->clear();
+        ui->picLabelUp->clear();
         ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));
     }
 }
@@ -51,8 +52,8 @@ void MainWindow::on_divideButton_clicked()
         int scale, fixedCol, fixedRow;
         if(picRatio >= cubeRatio)//row long
         {
-            scale = image_origin.cols/(cubeCol*3);//图像大小和魔方之比,整除
-            fixedRow = scale*cubeRow*3;//为了获得魔方列整数倍
+            scale = image_origin.cols/(cubeCol*3);//img size devide cube's totol col
+            fixedRow = scale*cubeRow*3;//set the size corresponding cube's
             fixedCol = scale*cubeCol*3;
         }
         else//col long
@@ -67,17 +68,17 @@ void MainWindow::on_divideButton_clicked()
         qDebug()<<"scale:"<<scale<<" row:"<<fixedRow<<" col:"<<fixedCol<<" Original resolution:"<<image_origin.rows<<image_origin.cols<<" remove:"<<removeRows<<removeCols;
 
         int removeRows_top,removeRows_down,removeCols_left,removeCols_right;
-        if(removeRows%2 != 0)//行删除量不是偶数
+        if(removeRows%2 != 0)//the remove num of rows is not even number
         {
-            //上比下多删1
+            //up need remove one more than down
             removeRows_top = removeRows/2 + 1;
             removeRows_down = removeRows/2;
         }
         else
             removeRows_top = removeRows_down = removeRows/2;
-        if(removeCols%2 != 0)//列删除量不是偶数
+        if(removeCols%2 != 0)//the remove num of cols is not even number
         {
-            //左比右多删1
+            //left need remove one more than right
             removeCols_left = removeCols/2 + 1;
             removeCols_right = removeCols/2;
         }
@@ -94,16 +95,46 @@ void MainWindow::on_divideButton_clicked()
         cv::resize(fixedImage, image_resize, dsize);
         image_resize = changeRubixColor(image_resize);
         cv::cvtColor(image_resize, image_resize, CV_BGR2RGB);
-        //Qimage= new QImage((const unsigned char*)(image_resize.data), image_resize.cols, image_resize.rows, QImage::Format_RGB888);
-
+        //image_resize---->this is what we want!!!!
         QImage QimgResize = QImage((const unsigned char*)(image_resize.data),image_resize.cols,image_resize.rows, image_resize.cols*image_resize.channels(),  QImage::Format_RGB888);
+        qDebug() << "QimgResizeRect:" << QimgResize.rect();
         ui->picLabel->clear();
         QImage imgScaled = QimgResize.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);
+        qDebug() << "imgScaledRect:" << imgScaled.rect();
         ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));//image insert into label
 
         /*--------------------------drawing grids----------------------------*/
+        QPicture picture;
+        QPainter painter;
+        QPen pen_thick,pen_thin;
+        pen_thick.setWidth(3);
+        pen_thick.setColor(Qt::gray);
+        pen_thin.setWidth(1);
+        pen_thin.setColor(Qt::gray);
+        painter.begin(&picture);
+        picture.setBoundingRect(imgScaled.rect()); //set the boundary of painting
+
+        //draw col line
+        painter.setPen(pen_thin);
+        for(int i = 0; i <= cubeCol*3; i++)
+            painter.drawLine(QLineF((float)imgScaled.rect().width()/cubeCol/3.0*i, 0, (float)imgScaled.rect().width()/cubeCol/3.0*i, imgScaled.rect().height()));
+        painter.setPen(pen_thick);
+        for(int i = 0; i <= cubeCol; i++)
+            painter.drawLine(QLineF((float)imgScaled.rect().width()/cubeCol*i, 0, (float)imgScaled.rect().width()/cubeCol*i, imgScaled.rect().height()));
+        //draw row line
+        painter.setPen(pen_thin);
+        for(int i = 0; i <= cubeRow*3; i++)
+            painter.drawLine(QLineF(0, (float)imgScaled.rect().height()/cubeRow/3.0*i, imgScaled.rect().width(), (float)imgScaled.rect().height()/cubeRow/3.0*i));
+        painter.setPen(pen_thick);
+        for(int i = 0; i <= cubeRow; i++)
+            painter.drawLine(QLineF(0, (float)imgScaled.rect().height()/cubeRow*i, imgScaled.rect().width(), (float)imgScaled.rect().height()/cubeRow*i));
+
+        painter.end();
+        picture.save("draw_record.pic");
+        ui->picLabelUp->setPicture(picture);
 
         /*------------output the image resize pixel info to a file-----------*/
+
 
     }
     else if(cubeRow*cubeCol < 4)
@@ -229,4 +260,9 @@ void MainWindow::on_scanButton_clicked()
 
     rubikState.launchCapture();
 
+}
+
+void MainWindow::on_rmGridsButton_clicked()
+{
+    ui->picLabelUp->clear();
 }
