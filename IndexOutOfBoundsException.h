@@ -9,6 +9,10 @@ using std::string;
 using std::exception;
 
 
+/// <summary>
+/// 
+/// </summary>
+/// <seealso cref="exception" />
 class IndexOutOfBoundsException : public exception {
 private:
 	int index;
@@ -16,6 +20,12 @@ private:
 	string msg;
 
 public:
+	/// <summary>
+	/// Initializes a new instance of the <see cref="IndexOutOfBoundsException"/> class.
+	/// </summary>
+	/// <param name="_index">The _index.</param>
+	/// <param name="_indexBound">The _index bound.</param>
+	/// <param name="_msg">The _MSG.</param>
 	IndexOutOfBoundsException(int _index, int _indexBound, string _msg) throw()
 		: index(_index), boundIndex(_indexBound), msg(_msg) {
 	};

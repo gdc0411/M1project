@@ -12,16 +12,16 @@ TARGET = M1project
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES +=\
         mainwindow.cpp \
-    RubikState.cpp
+    dialog1.cpp \
+    main.cpp
 
 HEADERS  += mainwindow.h \
-    RubikState.h \
-    Utils.h \
-    IndexOutOfBoundsException.h
+    dialog1.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialog1.ui
 
 INCLUDEPATH += C:/opencv/build/include
 

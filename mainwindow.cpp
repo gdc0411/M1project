@@ -256,9 +256,13 @@ cv::Mat changeRubixColor(cv::Mat _image)
 
 void MainWindow::on_scanButton_clicked()
 {
-    RubikState rubikState(0);
+    //RubikState rubikState(0);
 
-    rubikState.launchCapture();
+    //rubikState.launchCapture();
+    this->hide();
+    dlg.show();
+    dlg.exec();
+    this->show();
 
 }
 

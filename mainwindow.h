@@ -15,7 +15,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 #include <list>
-#include "RubikState.h"
+#include "dialog1.h"
 
 using namespace std;
 using namespace cv;
@@ -55,6 +55,7 @@ private:
     QImage Qimage;//image in qt
     cv::Mat image; //image during treatment in OpenCV
     cv::Mat image_origin;
+    Dialog1 dlg;
 };
 
 #endif // MAINWINDOW_H
