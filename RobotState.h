@@ -8,16 +8,16 @@
 #include <map>
 
 /*
-U0 : 180°
-U1 : 90°
-U2 : 0°
+U0 : 180d
+U1 : 90d
+U2 : 0d
 */
-#define robot_U0_to_1 "a"		//Turn the top motor from angle 180° to angle 90°
-#define robot_U1_to_0 "b"		//Turn the top motor from angle 90° to angle 180°
-#define robot_U0_to_2 "c"		//Turn the top motor from angle 180° to angle 0°
-#define robot_U2_to_0 "d"		//Turn the top motor from angle 0° to angle 180°
-#define robot_U1_to_2 "e"		//Turn the top motor from angle 90° to angle 0°
-#define robot_U2_to_1 "f"		//Turn the top motor from angle 0° to angle 90°
+#define robot_U0_to_1 "a"		//Turn the top motor from angle 180d to angle 90d
+#define robot_U1_to_0 "b"		//Turn the top motor from angle 90d to angle 180d
+#define robot_U0_to_2 "c"		//Turn the top motor from angle 180d to angle 0d
+#define robot_U2_to_0 "d"		//Turn the top motor from angle 0d to angle 180d
+#define robot_U1_to_2 "e"		//Turn the top motor from angle 90d to angle 0d
+#define robot_U2_to_1 "f"		//Turn the top motor from angle 0d to angle 90d
 
 #define robot_H0_to_3 "g"		//Go up from height 0 to height 3
 #define robot_D3_to_0 "h"		//Go down from height 3 to height 0
@@ -35,6 +35,8 @@ U2 : 0°
 #define robot_Bi "s"			//Put the balancer in reversed position
 #define robot_B "t"				//Put the balancer in standard position
 
+#define robot_init "z"
+
 /// <summary>
 /// Represents the state of the robot
 /// </summary>
@@ -42,7 +44,7 @@ class RobotState {
 public:
 	int height; //0, 1, 2, 3
 	bool balancer; //0, 1
-	int rotator; //In robot class : 0, 1 or 2 : Gives the current state (0°, 90°, 180°)
+	int rotator; //In robot class : 0, 1 or 2 : Gives the current state (0d 90d 180d
 				//For the state returned by getState : The rotations to perform (-1, 0, 1 or 2)
 	std::string referential; //U, F, R
 	void reset();

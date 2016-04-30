@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Rubik Pixel Art</string>
   </property>
   <widget class="QPushButton" name="lastStep">
    <property name="geometry">
@@ -39,50 +39,37 @@
     <string>Next</string>
    </property>
   </widget>
-  <widget class="QLabel" name="camFrameView">
+  <widget class="QPushButton" name="openCamera">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>600</width>
-     <height>500</height>
+     <x>70</x>
+     <y>710</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start Scan</string>
+   </property>
+  </widget>
+  <widget class="MyLabel" name="currentSideLabel">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>50</y>
+     <width>900</width>
+     <height>600</height>
     </rect>
    </property>
    <property name="text">
     <string/>
    </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
   </widget>
-  <widget class="QGraphicsView" name="currentSideView">
+  <widget class="QPushButton" name="openCamera_2">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>60</y>
-     <width>321</width>
-     <height>451</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QGraphicsView" name="sixSideView">
-   <property name="geometry">
-    <rect>
-     <x>25</x>
-     <y>550</y>
-     <width>701</width>
-     <height>192</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="openCamera">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>610</y>
+     <x>170</x>
+     <y>710</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -91,33 +78,40 @@
     <string>Open Camera</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="closeCamera">
+  <widget class="QLabel" name="camFrameView">
    <property name="geometry">
     <rect>
-     <x>890</x>
-     <y>610</y>
-     <width>93</width>
-     <height>28</height>
+     <x>90</x>
+     <y>50</y>
+     <width>821</width>
+     <height>600</height>
     </rect>
    </property>
    <property name="text">
-    <string>Close Camera</string>
+    <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="nextFace">
+  <widget class="QPushButton" name="runRobot">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>650</y>
+     <x>270</x>
+     <y>710</y>
      <width>93</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>Next Face</string>
+    <string>Run Robot</string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyLabel</class>
+   <extends>QLabel</extends>
+   <header>mylabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

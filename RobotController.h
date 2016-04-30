@@ -5,7 +5,6 @@
 #include <iostream>
 #include <windows.h>
 #include <commctrl.h>
-#include <stdlib.h>
 
 /// <summary>
 /// Handles the communication with the Arduino card and therefore with the Robot's motors

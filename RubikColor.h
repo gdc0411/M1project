@@ -9,13 +9,12 @@
 /// <summary>
 /// The colors of the rubik's cube
 /// </summary>
-enum RubikColor { WHITE = 0, GREEN = 1, RED = 2, BLUE = 3, ORANGE = 4, YELLOW = 5 };
+enum RubikColor { BLACK = -1, WHITE = 0, GREEN = 1, RED = 2, BLUE = 3, ORANGE = 4, YELLOW = 5 };
 
 /// <summary>
 /// The colors used to print in colors in the console. The order can not be changed
 /// </summary>
 enum ConsoleColor { DARKBLUE_ = 1, DARKGREEN_, DARKTEAL_, DARKRED_, DARKPINK_, DARKYELLOW_, GRAY_, DARKGRAY_, BLUE_, GREEN_, TEAL_, RED_, PINK_ /*ORANGE*/, YELLOW_, WHITE_ };
-
 
 ConsoleColor translate(RubikColor color);
 

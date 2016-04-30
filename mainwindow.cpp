@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+std::vector<QColor> colorTable_main{ Qt::white, Qt::green, Qt::red, Qt::blue, QColor(255,88,0), Qt::yellow };
+std::vector<QColor> colorTable_cube{ Qt::white, QColor(57,193,72), QColor(255,38,0), QColor(37,50,255), QColor(255,163,50), QColor(255,251,10) };
+
+
 cv::Mat convertToRubiks(cv::Mat img, cv::Mat palette);
 cv::Vec3b closestPaletteColor(cv::Vec3b color, cv::Mat palette);
 cv::Mat changeRubixColor(cv::Mat _image);
@@ -22,7 +26,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_OpenFile_clicked()
 {
     filename = QFileDialog::getOpenFileName(this,tr("Open File"),"D:",tr("Image(*.jpg *.jpeg *.png *.gif *.bmp *.tiff)"));
-    qDebug()<<"filename:"<<filename;filename.toLocal8Bit().data();
+    //qDebug()<<"filename:"<<filename;filename.toLocal8Bit().data();
     ui->pathLabel->setText(filename);
     if(!filename.isEmpty())
     {
@@ -65,7 +69,7 @@ void MainWindow::on_divideButton_clicked()
         int removeRows = image_origin.rows - fixedRow;
         int removeCols = image_origin.cols - fixedCol;
 
-        qDebug()<<"scale:"<<scale<<" row:"<<fixedRow<<" col:"<<fixedCol<<" Original resolution:"<<image_origin.rows<<image_origin.cols<<" remove:"<<removeRows<<removeCols;
+        //qDebug()<<"scale:"<<scale<<" row:"<<fixedRow<<" col:"<<fixedCol<<" Original resolution:"<<image_origin.rows<<image_origin.cols<<" remove:"<<removeRows<<removeCols;
 
         int removeRows_top,removeRows_down,removeCols_left,removeCols_right;
         if(removeRows%2 != 0)//the remove num of rows is not even number
@@ -85,22 +89,22 @@ void MainWindow::on_divideButton_clicked()
         else
             removeCols_left = removeCols_right = removeCols/2;
 
-        qDebug()<<"removeRow_fixed:"<<removeRows_top<<removeRows_down<<"removeCol_fixed:"<<removeCols_left<<removeCols_right;
+        //qDebug()<<"removeRow_fixed:"<<removeRows_top<<removeRows_down<<"removeCol_fixed:"<<removeCols_left<<removeCols_right;
         cv::Mat fixedImage = image_origin(Rect(removeCols_left,removeRows_top,fixedCol,fixedRow));//改好大小的图片
 
         //resize the image
         cv::Size dsize = cv::Size(cubeCol*3,cubeRow*3);//Image resolution of the match cube ratio
         //cv::Mat image_resize = fixedImage;
-        cv::Mat image_resize;
+
         cv::resize(fixedImage, image_resize, dsize);
         image_resize = changeRubixColor(image_resize);
         cv::cvtColor(image_resize, image_resize, CV_BGR2RGB);
         //image_resize---->this is what we want!!!!
         QImage QimgResize = QImage((const unsigned char*)(image_resize.data),image_resize.cols,image_resize.rows, image_resize.cols*image_resize.channels(),  QImage::Format_RGB888);
-        qDebug() << "QimgResizeRect:" << QimgResize.rect();
+        //qDebug() << "QimgResizeRect:" << QimgResize.rect();
         ui->picLabel->clear();
-        QImage imgScaled = QimgResize.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);
-        qDebug() << "imgScaledRect:" << imgScaled.rect();
+        imgScaled = QimgResize.scaled(ui->picLabel->size(),Qt::KeepAspectRatio);
+        //qDebug() << "imgScaledRect:" << imgScaled.rect();
         ui->picLabel->setPixmap(QPixmap::fromImage(imgScaled));//image insert into label
 
         /*--------------------------drawing grids----------------------------*/
@@ -132,27 +136,23 @@ void MainWindow::on_divideButton_clicked()
         painter.end();
         picture.save("draw_record.pic");
         ui->picLabelUp->setPicture(picture);
-
-        /*------------output the image resize pixel info to a file-----------*/
-
-
     }
     else if(cubeRow*cubeCol < 4)
     {
-        int ret1 = QMessageBox::warning(this, "Warning", "The number of cubes is at least four!", QMessageBox::Abort);
-        if (ret1 == QMessageBox::Abort)
+        int ret = QMessageBox::warning(this, "Warning", "The number of cubes is at least four!", QMessageBox::Abort);
+        if (ret == QMessageBox::Abort)
             qDebug() << "WARNING!!";
     }
     else if(filename.isEmpty())
     {
-        int ret2 = QMessageBox::warning(this, "Warning", "You need choose an image file!", QMessageBox::Abort);
-        if (ret2 == QMessageBox::Abort)
+        int ret = QMessageBox::warning(this, "Warning", "You need choose an image file!", QMessageBox::Abort);
+        if (ret == QMessageBox::Abort)
             qDebug() << "WARNING!!";
     }
     else if(image_origin.rows < cubeRow*3 || image_origin.cols < cubeCol*3)
     {
-        int ret3 = QMessageBox::warning(this, "Warning", "Too many cubes!", QMessageBox::Abort);
-        if (ret3 == QMessageBox::Abort)
+        int ret = QMessageBox::warning(this, "Warning", "Too many cubes!", QMessageBox::Abort);
+        if (ret == QMessageBox::Abort)
             qDebug() << "WARNING!!";
     }
 }
@@ -256,17 +256,99 @@ cv::Mat changeRubixColor(cv::Mat _image)
 
 void MainWindow::on_scanButton_clicked()
 {
-    //RubikState rubikState(0);
-
-    //rubikState.launchCapture();
     this->hide();
     dlg.show();
     dlg.exec();
     this->show();
-
 }
 
 void MainWindow::on_rmGridsButton_clicked()
 {
     ui->picLabelUp->clear();
+}
+
+void MainWindow::on_chooseCube_editingFinished()
+{
+    ui->divideButton->clicked();
+    ui->picLabelRoi->clear();
+    int num_cube = ui->chooseCube->value();
+    if(num_cube > 0 && num_cube <= cubeRow * cubeCol)
+    {
+        //find cube in pic
+        int num_row = (num_cube - 1) / cubeCol;//start at 0
+        int num_col = (num_cube - 1) % cubeCol; // start at 0
+        //qDebug() << "row,col:" << num_row << num_col;
+        chooseCubeColor = image_resize(cv::Rect(num_col*3,num_row*3,3,3));//cube what we choose
+
+//        //painting roi
+//        float multiple = (float)imgScaled.width() / (float)image_resize.size().width;
+//        QPicture picture0;
+//        QPainter painter0;
+//        QPen pen_roi;
+//        pen_roi.setColor(Qt::red);
+//        pen_roi.setWidth(2);
+//        painter0.begin(&picture0);
+//        painter0.setPen(pen_roi);
+//        //painting red Roi
+//        painter0.drawRect(QRectF(num_col*3*multiple,num_row*3*multiple,3*multiple,3*multiple));
+//        //qDebug() << QRectF(num_col*3*multiple,num_row*3*multiple,3*multiple,3*multiple);
+//        painter0.end();
+//        picture0.save("draw_roi.pic");
+//        ui->picLabelRoi->setPicture(picture0);
+
+
+        //painting cube
+        QPicture picture;
+        QPainter painter;
+        QPen pen_cube;
+        pen_cube.setColor(Qt::black);
+        pen_cube.setWidth(2);
+        painter.begin(&picture);
+        painter.setPen(pen_cube);
+        QBrush brush(Qt::SolidPattern);
+
+        //painting choose cube
+        int block_size = 40;
+        for(int i = 0; i < 9; i++)
+        {
+            //qDebug() << "RGB:" << chooseCubeColor.at<Vec3b>(i/3,i%3).val[0]<<chooseCubeColor.at<Vec3b>(i/3,i%3).val[1]<<chooseCubeColor.at<Vec3b>(i/3,i%3).val[2];
+            brush.setColor(QColor(chooseCubeColor.at<Vec3b>(i/3,i%3).val[0],chooseCubeColor.at<Vec3b>(i/3,i%3).val[1],chooseCubeColor.at<Vec3b>(i/3,i%3).val[2]));//RGB 3 channels
+            painter.setBrush(brush);
+            painter.drawRoundRect(QRect(block_size*i%(block_size*3),block_size*(i/3),block_size,block_size));
+        }
+        painter.end();
+        picture.save("draw_cube.pic");
+        ui->showCubeChoose->setPicture(picture);
+
+        //store colors of cube
+        for(int i = 0; i < 9; i++)
+        {
+            QColor qcolor = QColor(chooseCubeColor.at<Vec3b>(i/3,i%3).val[0],chooseCubeColor.at<Vec3b>(i/3,i%3).val[1],chooseCubeColor.at<Vec3b>(i/3,i%3).val[2]);//RGB 3 channels
+            int color_num;
+            if(qcolor == colorTable_cube[0])
+                color_num = 0;
+            else if(qcolor == colorTable_cube[1])
+                color_num = 1;
+            else if(qcolor == colorTable_cube[2])
+                color_num = 2;
+            else if(qcolor == colorTable_cube[3])
+                color_num = 3;
+            else if(qcolor == colorTable_cube[4])
+                color_num = 4;
+            else if(qcolor == colorTable_cube[5])
+                color_num = 5;
+            else
+                color_num = -1;
+            col[i] = RubikColor(color_num);
+            //qDebug() << "color:" << color_num;
+        }
+        dlg.setRubikColor(col);
+    }
+    else
+    {
+        int ret = QMessageBox::warning(this, "Warning", "Please choose the cube you want to make!", QMessageBox::Abort);
+        if (ret == QMessageBox::Abort)
+            qDebug() << "WARNING!!";
+    }
+
 }

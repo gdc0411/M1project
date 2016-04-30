@@ -5,13 +5,15 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTimer>
+#include <QGraphicsScene>
+#include <QGraphicsRectItem>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
+#include "Robot.h"
+#include "Rubik.h"
+#include "RubikColor.h"
 
-#define NB_CAPTURE 6
-#define ROBOT_DEBUG 1
 
 using namespace std;
 using namespace cv;
@@ -28,25 +30,35 @@ class Dialog1 : public QDialog
 public:
     explicit Dialog1(QWidget *parent = 0);
     ~Dialog1();
+    void setRubikColor(RubikColor colors[]);
+
 
 protected:
      void closeEvent(QCloseEvent *event);
 
 private slots:
-    void readFrame();
 
     void on_openCamera_clicked();
 
-    void on_closeCamera_clicked();
-
     void on_lastStep_clicked();
+
+    void on_nextStep_clicked();
+
+    void on_openCamera_2_clicked();
+
+    void readFrame();
+
+    void on_runRobot_clicked();
 
 private:
     Ui::Dialog1 *ui;
-    VideoCapture capture;
-    Mat cvframe;
-    //QImage *img;
+    Robot rob;
+    std::vector<std::vector<int>> colors;
+    cv::VideoCapture capture;
+    cv::Mat cvframe;
     QTimer *timer;
+    RubikColor col[9];
+
 
 };
 

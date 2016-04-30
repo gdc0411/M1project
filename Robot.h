@@ -10,7 +10,7 @@
 #include <vector>
 
 #define NB_CAPTURE 6
-#define ROBOT_DEBUG 1
+#define ROBOT_DEBUG 0
 
 /// <summary>
 /// Class representing the robot
@@ -20,18 +20,36 @@ public:
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Robot"/> class.
 	/// </summary>
-	Robot(int=0, cv::String = "Default Window Name");
+    Robot(int=0, cv::String = "Initial State Rubik Camera", std::string = "COM3");
+
+	/// <summary>
+	/// Initializes the robot move.
+	/// </summary>
+	bool initRobotMove();
+
 	/// <summary>
 	/// Converts and sends the rubik moves to the robot. Fills the robotMoves array
 	/// </summary>
 	/// <param name="rubikMoves">The rubik moves.</param>
 	void sendRubikMoves(std::vector<std::string> rubikMoves);
+
+	/// <summary>
+	/// Prints the content of the array rmoves, by translating the chars to the human-form move name ('a' --> "U0_to_1")
+	/// </summary>
+	/// <param name="rubikMoves">The rubik moves.</param>
+	void printSentRobotMoves();
+
+	/// <summary>
+	/// Prints the simplified content of the array rmoves, by translating the chars to the human-form move name ('a' --> "U0_to_1")
+	/// </summary>
+	/// <param name="rubikMoves">The rubik moves.</param>
+	void printSimplifiedSentRobotMoves();
 	
 	/// <summary>
 	/// Gets the robot moves filled by the "sendRubikMoves" function
 	/// </summary>
 	/// <returns>The list of the robot moves</returns>
-	std::vector<std::string> getRobotMoves() { return rmoves; };
+    std::vector<std::string> getRobotMoves() { return rmoves; }
 	
 	/// <summary>
 	/// Computes the cost of a rubik move.
@@ -48,21 +66,36 @@ public:
 	RobotController& getController();
 	
 	/// <summary>
-	/// Determines if one cv::Rect intersect an another cv::Rect.
+	/// Determines if one cv::Rect intersect an another cv::Rect
 	/// </summary>
-	/// <param name="">The list of contours delimited the cv::Rect</param>
+	/// <param name="points">The list of contours delimited the cv::Rect</param>
 	/// <returns>If one cv::Rect intersects an another cv::Rect</returns>
-	bool isRectCollision(std::vector<SquareRubik>);
+	bool isRectCollision(std::vector<SquareRubik> points);
+		
+	/// <summary>
+	/// Gets the number of cv::Rect in other cv::Rect.
+	/// </summary>
+	/// <param name="points">The list of contours delimited the cv::Rect</param>
+	/// <returns>The number of collision between cv::Rect</returns>
+	int getNbRectInOtherRect(std::vector<SquareRubik> points);
+
+	/// <summary>
+	/// Remove from points the bad cv::Rect including in an another one.
+	/// </summary>
+	/// <param name="points">The list of contours delimited the cv::Rect</param>
+	/// <returns>The list of contours without cv::Rect in an another one</returns>
+	std::vector<SquareRubik> isRectInOtherRect(std::vector<SquareRubik> points);
 		
 	/// <summary>
 	/// Formats the structure in order to be formatted as the input of the algorithm.
+	/// It'll change a vector<vector<SquareRubik>> to vector<vector<int>>. It only keep the color of each square.
 	/// </summary>
 	/// <param name="">The structure to be format</param>
 	/// <returns>The formatted list</returns>
 	std::vector<std::vector<int>> formatToAlgorithm(std::vector<std::vector<SquareRubik>>);
 	
 	/// <summary>
-	/// Swaps the specified side.
+	/// Swaps the specified side with an order defined by the second parameter.
 	/// </summary>
 	/// <param name="">The side to be swap</param>
 	/// <param name="">The ordered indexes</param>
@@ -70,7 +103,7 @@ public:
 	std::vector<SquareRubik> Robot::swap(std::vector<SquareRubik>, std::vector<int>);
 		
 	/// <summary>
-	/// Formats the sides.
+	/// Formats the sides (Convention on the report).
 	/// </summary>
 	/// <param name="sides">The sides.</param>
 	/// <returns>The formatted sides</returns>
@@ -141,7 +174,7 @@ public:
 	/// <param name="r1">The first SquareRubik</param>
 	/// <param name="r2">The second SquareRubik</param>
 	/// <returns>If the x position of r2 is greater than the one of r1</returns>
-	static bool sortXAxis(SquareRubik r1, SquareRubik r2) { return r1.position.x < r2.position.x; };
+    static bool sortXAxis(SquareRubik r1, SquareRubik r2) { return r1.position.x < r2.position.x; }
 	
 	/// <summary>
 	/// Sorts the y axis.
@@ -149,8 +182,7 @@ public:
 	/// <param name="r1">The first SquareRubik</param>
 	/// <param name="r2">The second SquareRubik</param>
 	/// <returns>If the y position of r2 is greater than the one of r1</returns>
-	static bool sortYAxis(SquareRubik r1, SquareRubik r2) { return r1.position.y < r2.position.y; };
-
+    static bool sortYAxis(SquareRubik r1, SquareRubik r2) { return r1.position.y < r2.position.y; }
 private:	
 	/// <summary>
 	/// The state of the robot
@@ -160,6 +192,15 @@ private:
 	/// Handles the communication with the Arduino card and therefore with the Robot's motors
 	/// </summary>
 	RobotController controller;
+
+	/// <summary>
+	/// Previous Rubik Move
+	/// </summary>
+	std::string previousRubikMove = "";
+
+
+	std::vector<Scalar> minColor;
+	std::vector<Scalar> maxColor;
 
 	/// <summary>
 	/// Converts rubik move and sends the associated robot moves
@@ -178,61 +219,61 @@ private:
 	std::vector<std::string> rmoves;
 	
 	/// <summary>
-	/// Turn the top motor from 180° to 90°
+	/// Turn the top motor from 180d to 90d	
 	/// </summary>
 	bool U0_to_1();
 
 	/// <summary>
-	/// Turn the top motor from 180° to 0°
+	/// Turn the top motor from 180d to 0d	
 	/// </summary>
 	bool U0_to_2();
 
 	/// <summary>
-	/// Turn the top motor from 90° to 0°
+	/// Turn the top motor from 90d to 0d	
 	/// </summary>
 	bool U1_to_0();
 
 	/// <summary>
-	/// Turn the top motor from 90° to 0°
+	/// Turn the top motor from 90d to 0d	
 	/// </summary>
 	bool U1_to_2();
 
 	/// <summary>
-	/// Turn the top motor from 0° to 180°
+	/// Turn the top motor from 0d to 180d	
 	/// </summary>
 	bool U2_to_0();
 
 	/// <summary>
-	/// Turn the top motor from 0° to 180°
+	/// Turn the top motor from 0d to 180d	
 	/// </summary>
 	bool U2_to_1();
 
 	/// <summary>
-	/// Turns the top motor to 180°
+	/// Turns the top motor to 180d	
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
 	bool U0();
 	
 	/// <summary>
-	/// Turns the top motor to 90°
+	/// Turns the top motor to 90d	
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
 	bool U1();
 	
 	/// <summary>
-	/// Turns the top motor to 0°
+	/// Turns the top motor to 0d	
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
 	bool U2();
 	
 	/// <summary>
-	/// Adds 90° to the motor position
+	/// Adds 90d to the motor position
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
 	bool U();
 	
 	/// <summary>
-	/// Removes 90° from the motor position
+	/// Removes 90d from the motor position
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
 	bool Ui();
@@ -345,13 +386,13 @@ private:
 	/// Put the cube in reversed position
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
-	bool Bi();
+	bool B();
 
 	/// <summary>
 	/// Put the cube in non-reversed position
 	/// </summary>
 	/// <returns>If the move has succeeded or not</returns>
-	bool B();
+	bool Bi();
 
 	/// <summary>
 	/// Resets the height position (goes back to height 0)

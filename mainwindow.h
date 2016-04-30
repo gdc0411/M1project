@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QLabel>
 #include <QMessageBox>
+#include <iostream>
 
 
 #include <opencv2/core/core.hpp>
@@ -16,6 +17,7 @@
 #include <math.h>
 #include <list>
 #include "dialog1.h"
+#include "RubikColor.h"
 
 using namespace std;
 using namespace cv;
@@ -47,6 +49,8 @@ private slots:
 
     void on_rmGridsButton_clicked();
 
+    void on_chooseCube_editingFinished();
+
 private:
     Ui::MainWindow *ui;
     QString filename;
@@ -56,6 +60,10 @@ private:
     cv::Mat image; //image during treatment in OpenCV
     cv::Mat image_origin;
     Dialog1 dlg;
+    QImage imgScaled;
+    Mat chooseCubeColor;
+    cv::Mat image_resize;
+    RubikColor col[9];
 };
 
 #endif // MAINWINDOW_H

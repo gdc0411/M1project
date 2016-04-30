@@ -283,6 +283,7 @@ void TestCampaign::solveOneCube(RubikColor colors[]) {
 	}
 	std::cout << std::endl;
 
+	robot.printSentRobotMoves();
 
 
 	std::cout << setcolor(RubikColor::WHITE) << "---------------------------------------------" << std::endl;

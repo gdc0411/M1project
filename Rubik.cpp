@@ -434,7 +434,7 @@ void Rubik::printCube() {
 					if (x % 3 == 0 || x % 3 == 2) //Corner
 					{
 						number = this->corners[Rubik::lines[y][x]]->getNumber();
-						if (number < 10) {
+						if (number < 10 && number >= 0) {
 							std::cout << " ";
 						}
 						std::cout << setcolor(this->corners[Rubik::lines[y][x]]->getColor()) << number;
@@ -442,7 +442,7 @@ void Rubik::printCube() {
 					else //Edge
 					{
 						number = this->edges[Rubik::lines[y][x]]->getNumber();
-						if (number < 10) {
+						if (number < 10 && number >= 0) {
 							std::cout << " ";
 						}
 						std::cout << setcolor(this->edges[Rubik::lines[y][x]]->getColor()) << number;
@@ -454,7 +454,7 @@ void Rubik::printCube() {
 					if (x % 3 == 0 || x % 3 == 2) //Edge
 					{
 						number = this->edges[Rubik::lines[y][x]]->getNumber();
-						if (number < 10) {
+						if (number < 10 && number >= 0) {
 							std::cout << " ";
 						}
 						std::cout << setcolor(this->edges[Rubik::lines[y][x]]->getColor()) << number;
